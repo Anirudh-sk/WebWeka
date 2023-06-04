@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -8,6 +8,8 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+import joblib
+
 
 app = Flask(__name__)
 
@@ -53,6 +55,9 @@ def index():
             test_train_split = int(request.form['test_train_split'])
 
             model, X_test, y_test = train_model(df, algorithm, target_variable, test_train_split)
+            joblib.dump(model, 'static/model.pkl')
+            session['columns'] = list(df.columns)
+            session['target_variable'] = target_variable
 
             y_pred = model.predict(X_test)
             cm = confusion_matrix(y_test, y_pred)
@@ -93,39 +98,36 @@ def index():
 
     return render_template('index.html')
 
-
 @app.route('/predictinput', methods=['GET', 'POST'])
 def predict_input():
+    columns = session.get('columns', [])
+    target_variable = session.get('target_variable', [])
     if request.method == 'POST':
-        # Get uploaded file
-        file = request.files['csv_file']
-        if file:
-            # Read the CSV file into a pandas DataFrame
-            df = pd.read_csv(file)
-            df = preprocess_data(df)
-            
-            # Get form data
-            algorithm = request.form['algorithm']
-            target_variable = request.form['target_variable']
-            test_train_split = int(request.form['test_train_split'])
+        # Load the trained model
+        model = joblib.load('static/model.pkl')
 
-            model, X_test, y_test = train_model(df, algorithm, target_variable, test_train_split)
+        # Get form data
+        input_values = {}
+        for column in columns:
+            input_values[column] = [request.form[column]]
 
-            # Get input values for prediction
-            input_values = {}
-            for column in df.columns:
-                if column != target_variable:
-                    input_values[column] = request.form[column]
+        # Create DataFrame for prediction
+        input_df = pd.DataFrame.from_dict(input_values)
+        print(input_df)
 
-            # Predict the output
-            input_df = pd.DataFrame([input_values])
-            input_df = preprocess_data(input_df)
-            prediction = model.predict(input_df)
-            
-            return render_template('predict_input.html', prediction=prediction[0])
+        # Preprocess input data
+        input_df = preprocess_data(input_df)
+        print(input_df)
 
-    return render_template('predict_input.html')
+        # Make prediction
+        prediction = model.predict(input_df)
+        output = "Good" if prediction[0] else "Average"
+
+        return render_template('predict_input.html', columns=columns, prediction=output)
+
+    return render_template('predict_input.html', columns=columns, target=target_variable)
 
 
 if __name__ == '__main__':
+    app.secret_key = 'somerandomkey'
     app.run(debug=True)
