@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Web Tool</title>
+    <title>Web Weka</title>
 </head>
 <body>
-    <h1>Web Tool</h1>
+    <h1>Web Weka</h1>
+    <button onclick="window.location.href='/predictinput'">predict</button>
     <form method="POST" action="/" enctype="multipart/form-data">
         <label for="csv_file">Upload CSV File:</label>
         <input type="file" name="csv_file" id="csv_file" onchange="populateTargetVariables()"><br><br>

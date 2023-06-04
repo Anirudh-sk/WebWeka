@@ -9,28 +9,28 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import joblib
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+
+
 
 
 app = Flask(__name__)
 
 def preprocess_data(df):
-    # Handle non-numeric columns
     non_numeric_cols = df.select_dtypes(include=['object']).columns
     for col in non_numeric_cols:
-        df[col] = pd.factorize(df[col])[0] + 1  # Convert non-numeric values to numeric labels
+        df[col] = pd.factorize(df[col])[0] + 1 
 
-    # Handle missing values
-    df.fillna(0, inplace=True)  # Replace missing values with 0
+    df.fillna(0, inplace=True)  
 
     return df
 
 def train_model(df, algorithm, target_variable, test_train_split):
-    # Split data into train and test sets
     X = df.drop(columns=[target_variable])
     y = df[target_variable]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_train_split/100, random_state=42)
 
-    # Train the selected algorithm
     if algorithm == 'decision_tree':
         model = DecisionTreeClassifier()
     elif algorithm == 'random_forest':
@@ -42,17 +42,16 @@ def train_model(df, algorithm, target_variable, test_train_split):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Get uploaded file
         file = request.files['csv_file']
         if file:
-            # Read the CSV file into a pandas DataFrame
             df = pd.read_csv(file)
             df = preprocess_data(df)
-            
-            # Get form data
+            print(df.head())
+
             algorithm = request.form['algorithm']
-            target_variable = request.form['target_variable']
+            target_variable = request.form['target_variable'].strip()  
             test_train_split = int(request.form['test_train_split'])
+
 
             model, X_test, y_test = train_model(df, algorithm, target_variable, test_train_split)
             joblib.dump(model, 'static/model.pkl')
@@ -66,7 +65,6 @@ def index():
 
             print(target_variable)
 
-            # Evaluate the model
             accuracy = model.score(X_test, y_test)*100
             print(f"Accuracy: {accuracy}")
             print(target_variable)
@@ -77,7 +75,7 @@ def index():
             plt.ylabel('Count')
             plt.title('Distribution of Target Variable')
             plt.tight_layout()
-            plt.savefig('static/countplot.png')  # Save the plot as a static image
+            plt.savefig('static/countplot.png')  
 
             # Plot 2: Kernel Density Estimate
             plt.figure()
@@ -103,25 +101,21 @@ def predict_input():
     columns = session.get('columns', [])
     target_variable = session.get('target_variable', [])
     if request.method == 'POST':
-        # Load the trained model
         model = joblib.load('static/model.pkl')
 
-        # Get form data
         input_values = {}
         for column in columns:
-            input_values[column] = [request.form[column]]
+            if column != target_variable:  
+                input_values[column] = [request.form.get(column)]
 
-        # Create DataFrame for prediction
         input_df = pd.DataFrame.from_dict(input_values)
         print(input_df)
 
-        # Preprocess input data
         input_df = preprocess_data(input_df)
         print(input_df)
 
-        # Make prediction
         prediction = model.predict(input_df)
-        output = "Good" if prediction[0] else "Average"
+        output = prediction[0] 
 
         return render_template('predict_input.html', columns=columns, prediction=output)
 

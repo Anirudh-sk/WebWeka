@@ -8,7 +8,7 @@
     <form action="/predictinput" method="post">
         {% for column in columns %}
             {% if column != target %}
-            <p>{{target}}</p>
+            <!-- <p>{{target}}</p> -->
                 <label for="{{ column }}">{{ column }}:</label>
                 <input type="text" name="{{ column }}" id="{{ column }}" required><br><br>
             {% endif %}
