@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Tool</title>
+</head>
+<body>
+    <h1>Web Tool</h1>
+    <form method="POST" action="/" enctype="multipart/form-data">
+        <label for="csv_file">Upload CSV File:</label>
+        <input type="file" name="csv_file" id="csv_file" onchange="populateTargetVariables()"><br><br>
+
+        <label for="algorithm">Select Algorithm:</label>
+        <select name="algorithm" id="algorithm">
+            <option value="decision_tree">Decision Tree</option>
+            <option value="random_forest">Random Forest</option>
+            <!-- Add more algorithm options as needed -->
+        </select><br><br>
+
+        <label for="target_variable">Select Target Variable:</label>
+        <select name="target_variable" id="target_variable">
+            <!-- Options will be populated dynamically -->
+        </select><br><br>
+
+        <label for="test_train_split">Test-Train Split (%):</label>
+        <input type="number" name="test_train_split" id="test_train_split" value="20" min="1" max="99"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if accuracy %}
+    <h2>Output:</h2>
+    <p>Accuracy: {{ accuracy }}</p>
+
+    <h2>Plots:</h2>
+    <img src="{{ url_for('static', filename=graph1) }}" height="500" width="500" alt="Distribution of Target Variable">
+    <img src="{{ url_for('static', filename=graph2) }}" height="500" width="500" alt="Kernel Density Estimate">
+    <img src="{{ url_for('static', filename=graph3) }}" height="500" width="500" alt="Pairplot">
+
+    <h2>Confusion Matrix:</h2>
+    {% for row in cm %}
+        <p>{{ row }}</p>
+    {% endfor %}
+    {% endif %}
+
+    <script>
+        function populateTargetVariables() {
+            const fileInput = document.getElementById('csv_file');
+            const targetVariableSelect = document.getElementById('target_variable');
+            targetVariableSelect.innerHTML = ''; // Clear existing options
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const contents = e.target.result;
+                const lines = contents.split('\n');
+                const headers = lines[0].split(',');
+
+                for (let i = 0; i < headers.length; i++) {
+                    const option = document.createElement('option');
+                    option.value = headers[i];
+                    option.textContent = headers[i];
+                    targetVariableSelect.appendChild(option);
+                }
+            }
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

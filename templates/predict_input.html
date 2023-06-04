@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predict Input</title>
+</head>
+<body>
+    <h1>Predict Input</h1>
+    <form action="/predictinput" method="post" enctype="multipart/form-data">
+        <label for="csv_file">Upload CSV File:</label>
+        <input type="file" name="csv_file" id="csv_file" required><br><br>
+
+        <label for="algorithm">Algorithm:</label>
+        <select name="algorithm" id="algorithm">
+            <option value="decision_tree">Decision Tree</option>
+            <option value="random_forest">Random Forest</option>
+        </select><br><br>
+
+        <label for="target_variable">Target Variable:</label>
+        <select name="target_variable" id="target_variable">
+            {% for column in df_columns %}
+                <option value="{{ column }}">{{ column }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="test_train_split">Test Train Split (%):</label>
+        <input type="number" name="test_train_split" id="test_train_split" min="1" max="99" required><br><br>
+
+        {% for column in df_columns %}
+            {% if column != target_variable %}
+                <label for="{{ column }}">{{ column }}:</label>
+                <input type="text" name="{{ column }}" id="{{ column }}" required><br><br>
+            {% endif %}
+        {% endfor %}
+
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction %}
+    <h2>Prediction:</h2>
+    <p>{{ prediction }}</p>
+    {% endif %}
+</body>
+</html>
