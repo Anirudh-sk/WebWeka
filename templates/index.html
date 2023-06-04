@@ -31,11 +31,14 @@
     {% if accuracy %}
     <h2>Output:</h2>
     <p>Accuracy: {{ accuracy }}</p>
-
+    
+    
+    {% if graph1 %}
     <h2>Plots:</h2>
     <img src="{{ url_for('static', filename=graph1) }}" height="500" width="500" alt="Distribution of Target Variable">
     <img src="{{ url_for('static', filename=graph2) }}" height="500" width="500" alt="Kernel Density Estimate">
     <img src="{{ url_for('static', filename=graph3) }}" height="500" width="500" alt="Pairplot">
+    {% endif %}
 
     <h2>Confusion Matrix:</h2>
     {% for row in cm %}

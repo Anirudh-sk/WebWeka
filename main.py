@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import joblib
-from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 
 
@@ -19,10 +19,28 @@ app = Flask(__name__)
 
 def preprocess_data(df):
     non_numeric_cols = df.select_dtypes(include=['object']).columns
+    le = LabelEncoder()
     for col in non_numeric_cols:
-        df[col] = pd.factorize(df[col])[0] + 1 
+        if df[col].dtype == 'object':
+            df[col] = le.fit_transform(df[col]) + 1 
 
     df.fillna(0, inplace=True)  
+
+    return df
+
+def preprocess_user_input(df):
+    print(df.dtypes)
+
+    numeric_cols = list(set(df.columns) - set(df.select_dtypes(include=['object']).columns))
+    df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='coerce')
+    print(numeric_cols)
+
+    non_numeric_cols = df.select_dtypes(include=['object']).columns
+    print(non_numeric_cols)
+    le = LabelEncoder()
+    for col in non_numeric_cols:
+        if df[col].dtype == 'object':
+            df[col] = le.fit_transform(df[col]) + 1  
 
     return df
 
@@ -100,13 +118,23 @@ def index():
 def predict_input():
     columns = session.get('columns', [])
     target_variable = session.get('target_variable', [])
+    columnsdf = pd.DataFrame(columns)
+    print(columnsdf)
+    numeric_cols = set(columns) - set(columnsdf.select_dtypes(include=['object']).columns)
+    print(numeric_cols)
     if request.method == 'POST':
         model = joblib.load('static/model.pkl')
 
         input_values = {}
         for column in columns:
-            if column != target_variable:  
-                input_values[column] = [request.form.get(column)]
+            if column != target_variable:
+                value = request.form.get(column)
+                if column in numeric_cols:
+                    try:
+                        value = pd.to_numeric(value)
+                    except ValueError:
+                        pass
+                input_values[column] = [value]
 
         input_df = pd.DataFrame.from_dict(input_values)
         print(input_df)
@@ -115,11 +143,14 @@ def predict_input():
         print(input_df)
 
         prediction = model.predict(input_df)
+        print(prediction)
         output = prediction[0] 
+        print(output)
 
         return render_template('predict_input.html', columns=columns, prediction=output)
 
     return render_template('predict_input.html', columns=columns, target=target_variable)
+
 
 
 if __name__ == '__main__':

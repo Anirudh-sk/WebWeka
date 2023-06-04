@@ -5,6 +5,7 @@
 </head>
 <body>
     <h1>Predict Input</h1>
+    <button onclick="window.location.href='/'">Home</button>
     <form action="/predictinput" method="post">
         {% for column in columns %}
             {% if column != target %}
@@ -17,9 +18,9 @@
         <input type="submit" value="Predict">
     </form>
 
-    {% if prediction %}
+    <!-- {% if prediction %} -->
     <h2>Prediction:</h2>
-    <p>{{ prediction }}</p>
-    {% endif %}
+    <p>{{ prediction|default }}</p>
+    <!-- {% endif %} -->
 </body>
 </html>
