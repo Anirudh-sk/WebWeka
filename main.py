@@ -11,6 +11,9 @@ from sklearn.metrics import confusion_matrix
 import joblib
 # from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
 
 
 
@@ -53,6 +56,12 @@ def train_model(df, algorithm, target_variable, test_train_split):
         model = DecisionTreeClassifier()
     elif algorithm == 'random_forest':
         model = RandomForestClassifier()
+    elif algorithm == 'naive_bayes':
+        model = GaussianNB()
+    elif algorithm == 'logistic_regression':
+        model = LogisticRegression()
+    elif algorithm == 'linear_regression':
+        model = LinearRegression()
     model.fit(X_train, y_train)
 
     return model, X_test, y_test
@@ -77,7 +86,11 @@ def index():
             session['target_variable'] = target_variable
 
             y_pred = model.predict(X_test)
-            cm = confusion_matrix(y_test, y_pred)
+
+            if algorithm == 'linear_regression':
+                cm=model.score(X_test, y_test)*100
+            else:
+                cm = confusion_matrix(y_test, y_pred)
             print("Confusion Matrix:")
             print(cm)
 
