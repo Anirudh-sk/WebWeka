@@ -6,14 +6,14 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: ai-mini
+      app: ai-mini-app
   template:
     metadata:
       labels:
-        app: ai-mini
+        app: ai-mini-app
     spec:
       containers:
-        - name: ai-mini
+        - name: ai-mini-container
           image: ai-mini
           imagePullPolicy: IfNotPresent
           ports:

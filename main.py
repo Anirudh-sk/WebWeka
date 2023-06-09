@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import joblib
+import os
+
 # from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import GaussianNB
@@ -19,6 +21,9 @@ from sklearn.linear_model import LinearRegression
 
 
 app = Flask(__name__)
+app.secret_key = "anirudh"
+app.config.update(SECRET_KEY=os.urandom(24))
+
 
 def preprocess_data(df):
     non_numeric_cols = df.select_dtypes(include=['object']).columns
@@ -167,5 +172,6 @@ def predict_input():
 
 
 if __name__ == '__main__':
-    app.secret_key = 'somerandomkey'
-    app.run(debug=True)
+    app.secret_key='anirudh'
+    
+    app.run()
