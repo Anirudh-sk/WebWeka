@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ai-mini-deployment
+  name: ai-mini-app
 spec:
   replicas: 3
   selector:
@@ -13,8 +13,8 @@ spec:
         app: ai-mini-app
     spec:
       containers:
-        - name: ai-mini-container
-          image: ai-mini
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 5000
+      - name: ai-mini-app
+        image: anirudh30/ai-mini-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000

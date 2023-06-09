@@ -6,7 +6,7 @@
 # EXPOSE 5000
 # CMD ["python", "main.py"]
 
-FROM python:3.9
+FROM python:3.9.5
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -15,8 +15,8 @@ EXPOSE 5000
 ENV FLASK_APP=main.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_SECRET_KEY="anirudh"
-# CMD ["flask", "run", "--host=0.0.0.0"]
-CMD ["python", "-c", "import os; os.environ['FLASK_APP']='main.py'; os.environ['FLASK_RUN_HOST']='0.0.0.0'; os.environ['FLASK_SECRET_KEY']='anirudh'; import main; main.app.run(host='0.0.0.0', port=5000)"]
+CMD ["flask", "run", "--host=0.0.0.0"]
+# CMD ["python", "-c", "import os; os.environ['FLASK_APP']='main.py'; os.environ['FLASK_RUN_HOST']='0.0.0.0'; os.environ['FLASK_SECRET_KEY']='anirudh'; import main; main.app.run(host='0.0.0.0', port=5000)"]
 
 
 
