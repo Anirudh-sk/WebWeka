@@ -10,7 +10,7 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import joblib
 import os
-
+import time
 # from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import GaussianNB
@@ -76,6 +76,7 @@ def index():
     if request.method == 'POST':
         file = request.files['csv_file']
         if file:
+            dataset_name = file.filename.rsplit('.', 1)[0]
             df = pd.read_csv(file)
             df = preprocess_data(df)
             print(df.head())
@@ -86,7 +87,12 @@ def index():
 
 
             model, X_test, y_test = train_model(df, algorithm, target_variable, test_train_split)
-            joblib.dump(model, 'static/model.pkl')
+
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            model_filename = f"{dataset_name}_{algorithm}_{timestamp}.pkl"
+            joblib.dump(model, os.path.join('static', model_filename))
+
+            # joblib.dump(model, 'static/model.pkl')
             session['columns'] = list(df.columns)
             session['target_variable'] = target_variable
 
@@ -140,8 +146,15 @@ def predict_input():
     print(columnsdf)
     numeric_cols = set(columns) - set(columnsdf.select_dtypes(include=['object']).columns)
     print(numeric_cols)
+    model_files = [file for file in os.listdir('static') if file.endswith('.pkl')]
+
     if request.method == 'POST':
-        model = joblib.load('static/model.pkl')
+
+        selected_model = request.form.get('selected_model')
+        model_path = os.path.join('static', selected_model)
+        model = joblib.load(model_path)
+
+        # model = joblib.load('static/model.pkl')
 
         input_values = {}
         for column in columns:
@@ -167,7 +180,7 @@ def predict_input():
 
         return render_template('predict_input.html', columns=columns, prediction=output)
 
-    return render_template('predict_input.html', columns=columns, target=target_variable)
+    return render_template('predict_input.html', columns=columns, model_files=model_files , target=target_variable)
 
 
 
