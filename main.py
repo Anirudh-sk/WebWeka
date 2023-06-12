@@ -16,6 +16,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import LinearRegression
+from ydata_profiling import ProfileReport
+
+
 
 
 
@@ -92,6 +95,10 @@ def index():
             model_filename = f"{dataset_name}_{algorithm}_{timestamp}.pkl"
             joblib.dump(model, os.path.join('static', model_filename))
 
+            profile = ProfileReport(df, title="Profiling Report")
+            profile.to_file("templates/report.html")
+
+
             # joblib.dump(model, 'static/model.pkl')
             session['columns'] = list(df.columns)
             session['target_variable'] = target_variable
@@ -137,6 +144,10 @@ def index():
             return render_template('index.html', accuracy=accuracy, graph='countplot.png', cm=cm,graph1='countplot.png', graph2='kdeplot.png', graph3='pairplot.png')
 
     return render_template('index.html')
+
+@app.route('/report')
+def report():
+    return render_template('report.html')
 
 @app.route('/predictinput', methods=['GET', 'POST'])
 def predict_input():

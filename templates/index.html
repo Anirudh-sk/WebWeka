@@ -1,151 +1,201 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Web Weka</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        body {
-            background-color: #212529;
-            color: #fff;
-        }
-        h1, h2 {
-            color: #fff;
-        }
-        .card {
-            background-color: #343a40;
-            color: #fff;
-        }
-        body::-webkit-scrollbar {
-  width: 0.35em;
-}
+      body {
+        background-color: #212529;
+        color: #fff;
+      }
+      h1,
+      h2 {
+        color: #fff;
+      }
+      .card {
+        background-color: #343a40;
+        color: #fff;
+      }
+      body::-webkit-scrollbar {
+        width: 0.35em;
+      }
 
-body::-webkit-scrollbar-track {
-  background-color: #062c3f;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
+      body::-webkit-scrollbar-track {
+        background-color: #062c3f;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      }
 
-body::-webkit-scrollbar-thumb {
-  background-color: #00aced;
-  border-radius: 30px;
-}
-    
-
+      body::-webkit-scrollbar-thumb {
+        background-color: #00aced;
+        border-radius: 30px;
+      }
     </style>
-</head>
-<body class="bg-dark text-white text-center">
+  </head>
+  <body class="bg-dark text-white text-center">
+    <nav class="navbar navbar-dark bg-dark"></nav>
     <nav class="navbar navbar-dark bg-dark">
-      </nav>
-        <nav class="navbar navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Web Weka</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="">Home</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/predictinput">Predict Values</a>
-                    </li>
-                    
-                    </ul>
-                </div>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Web Weka</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/predictinput">Predict Values</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container text-center" style="width: 40%">
+      <form method="POST" action="/" enctype="multipart/form-data" class="mt-4">
+        <div class="form-group">
+          <label for="csv_file">Upload CSV File:</label>
+          <input
+            type="file"
+            name="csv_file"
+            id="csv_file"
+            onchange="populateTargetVariables()"
+            class="form-control"
+          />
+        </div>
+        <br />
+
+        <div class="form-group">
+          <label for="algorithm">Select Algorithm:</label>
+          <select name="algorithm" id="algorithm" class="form-control">
+            <option value="decision_tree">Decision Tree</option>
+            <option value="random_forest">Random Forest</option>
+            <option value="naive_bayes">Naive Bayes</option>
+            <option value="logistic_regression">Logistic Regression</option>
+            <option value="linear_regression">Linear Regression</option>
+          </select>
+        </div>
+        <br />
+
+        <div class="form-group">
+          <label for="target_variable">Select Target Variable:</label>
+          <select
+            name="target_variable"
+            id="target_variable"
+            class="form-control"
+          ></select>
+        </div>
+        <br />
+
+        <div class="form-group">
+          <label for="test_train_split">Test-Train Split (%):</label>
+          <input
+            type="number"
+            name="test_train_split"
+            id="test_train_split"
+            value="20"
+            min="1"
+            max="99"
+            class="form-control"
+          />
+        </div>
+        <br />
+
+        <input type="submit" value="Submit" class="btn btn-primary" />
+      </form>
+      <div class="mt-4">
+          <h2>Profiling Report:</h2>
+          <div class="d-flex justify-content-center">
+              <div class="container">
+                <a href="/report" class="btn btn-primary">View Report</a>
               </div>
-        </nav>
-
-    <div class="container text-center" style="width: 40%;">
-        <form method="POST" action="/" enctype="multipart/form-data" class="mt-4">
-            <div class="form-group">
-                <label for="csv_file">Upload CSV File:</label>
-                <input type="file" name="csv_file" id="csv_file" onchange="populateTargetVariables()" class="form-control">
-            </div><br>
-
-            <div class="form-group">
-                <label for="algorithm">Select Algorithm:</label>
-                <select name="algorithm" id="algorithm" class="form-control">
-                    <option value="decision_tree">Decision Tree</option>
-                    <option value="random_forest">Random Forest</option>
-                    <option value="naive_bayes">Naive Bayes</option>
-                    <option value="logistic_regression">Logistic Regression</option>
-                    <option value="linear_regression">Linear Regression</option>
-                </select>
-            </div><br>
-
-            <div class="form-group">
-                <label for="target_variable">Select Target Variable:</label>
-                <select name="target_variable" id="target_variable" class="form-control">
-                    
-                </select>
-            </div><br>
-
-            <div class="form-group">
-                <label for="test_train_split">Test-Train Split (%):</label>
-                <input type="number" name="test_train_split" id="test_train_split" value="20" min="1" max="99" class="form-control">
-            </div><br>
-
-            <input type="submit" value="Submit" class="btn btn-primary">
-        </form>
-
-        {% if accuracy %}
-        <h2 class="mt-5">Output:</h2>
-        <div class="card mt-4">
-            <div class="card-body">
-                <p class="card-text">Accuracy: {{ accuracy }}</p>
-            </div>
+          </div>
+      </div>
+      {% if accuracy %}
+      <h2 class="mt-5">Output:</h2>
+      <div class="card mt-4">
+        <div class="card-body">
+          <p class="card-text">Accuracy: {{ accuracy }}</p>
         </div>
+      </div>
 
-        <h2 class="mt-5">Confusion Matrix:</h2>
-        <div class="card mt-4">
-            <div class="card-body">
-                    <p class="card-text">{{ cm }}</p>
-            </div>
+      <h2 class="mt-5">Confusion Matrix:</h2>
+      <div class="card mt-4">
+        <div class="card-body">
+          <p class="card-text">{{ cm }}</p>
         </div>
+      </div>
 
-        {% if graph1 %}
-        <h2 class="mt-5">Plots</h2>
-        <div class="card mt-4">
-            <img src="{{ url_for('static', filename=graph1) }}" height="500" width="500" alt="Distribution of Target Variable" class="card-img-top">
-            <div class="card-body">
-                <img src="{{ url_for('static', filename=graph2) }}" height="500" width="500" alt="Kernel Density Estimate" class="card-img-top">
-            </div>
-            <div class="card-body">
-                <img src="{{ url_for('static', filename=graph3) }}" height="500" width="500" alt="Pairplot" class="card-img-top">
-            </div>
+      {% if graph1 %}
+      <h2 class="mt-5">Plots</h2>
+      <div class="card mt-4">
+        <img
+          src="{{ url_for('static', filename=graph1) }}"
+          height="500"
+          width="500"
+          alt="Distribution of Target Variable"
+          class="card-img-top"
+        />
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename=graph2) }}"
+            height="500"
+            width="500"
+            alt="Kernel Density Estimate"
+            class="card-img-top"
+          />
         </div>
-        {% endif %}
-
-
-        {% endif %}
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename=graph3) }}"
+            height="500"
+            width="500"
+            alt="Pairplot"
+            class="card-img-top"
+          />
+        </div>
+      </div>
+      {% endif %} {% endif %}
     </div>
 
     <script>
-        function populateTargetVariables() {
-            const fileInput = document.getElementById('csv_file');
-            const targetVariableSelect = document.getElementById('target_variable');
-            targetVariableSelect.innerHTML = ''; // Clear existing options
+      function populateTargetVariables() {
+        const fileInput = document.getElementById("csv_file");
+        const targetVariableSelect = document.getElementById("target_variable");
+        targetVariableSelect.innerHTML = ""; // Clear existing options
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-            reader.onload = function(e) {
-                const contents = e.target.result;
-                const lines = contents.split('\n');
-                const headers = lines[0].split(',');
+        reader.onload = function (e) {
+          const contents = e.target.result;
+          const lines = contents.split("\n");
+          const headers = lines[0].split(",");
 
-                for (let i = 0; i < headers.length; i++) {
-                    const option = document.createElement('option');
-                    option.value = headers[i];
-                    option.textContent = headers[i];
-                    targetVariableSelect.appendChild(option);
-                }
-            }
+          for (let i = 0; i < headers.length; i++) {
+            const option = document.createElement("option");
+            option.value = headers[i];
+            option.textContent = headers[i];
+            targetVariableSelect.appendChild(option);
+          }
+        };
 
-            reader.readAsText(file);
-        }
+        reader.readAsText(file);
+      }
     </script>
-</body>
+  </body>
 </html>
